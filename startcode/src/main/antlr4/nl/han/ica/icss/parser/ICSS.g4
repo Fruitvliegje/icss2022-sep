@@ -41,9 +41,37 @@ MIN: '-';
 MUL: '*';
 ASSIGNMENT_OPERATOR: ':=';
 
+// ? Optioneel: 0 of 1 keer
+// * 0 of meer keer
+// + 1 of meer
+// ('a' | 'b') 'c'; a of b anders altijd c
 
 
 
 //--- PARSER: ---
-stylesheet: EOF;
+
+
+
+stylesheet: ruleset+ ;
+ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
+selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
+declaration: LOWER_IDENT COLON variable SEMICOLON;
+variable:PIXELSIZE | PERCENTAGE | COLOR | SCALAR;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
