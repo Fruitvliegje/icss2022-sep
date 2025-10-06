@@ -52,11 +52,15 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 
-stylesheet: ruleset+ ;
+stylesheet: variable* ruleset+ ;
+
+variable: variableName ASSIGNMENT_OPERATOR value SEMICOLON;
+variableName: CAPITAL_IDENT;
+
 ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
 selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
-declaration: LOWER_IDENT COLON variable SEMICOLON;
-variable:PIXELSIZE | PERCENTAGE | COLOR | SCALAR;
+declaration: LOWER_IDENT COLON value SEMICOLON;
+value:PIXELSIZE | PERCENTAGE | COLOR | SCALAR | TRUE| FALSE | variableName;
 
 
 
