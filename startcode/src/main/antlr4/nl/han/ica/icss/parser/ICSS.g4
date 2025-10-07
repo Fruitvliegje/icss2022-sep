@@ -52,28 +52,16 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 
-stylesheet: variable* ruleset+ ;
+stylesheet: variable* ruleset* ;
 
-variable: variableName ASSIGNMENT_OPERATOR value SEMICOLON;
+variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON;
 variableName: CAPITAL_IDENT;
 
 ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
 selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
-declaration: LOWER_IDENT COLON value SEMICOLON;
+declaration: LOWER_IDENT COLON sum SEMICOLON;
 value:PIXELSIZE | PERCENTAGE | COLOR | SCALAR | TRUE| FALSE | variableName;
-
-
-
-
-
-
-
-
-
-
-
-
-
+sum : sum MUL value | sum PLUS value | sum MIN value | value;
 
 
 
