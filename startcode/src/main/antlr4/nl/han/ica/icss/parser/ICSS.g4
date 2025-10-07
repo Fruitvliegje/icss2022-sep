@@ -59,11 +59,14 @@ variableName: CAPITAL_IDENT;
 
 ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
 selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
-declaration: LOWER_IDENT COLON sum SEMICOLON;
-value:PIXELSIZE | PERCENTAGE | COLOR | SCALAR | TRUE| FALSE | variableName;
+declaration:  property COLON sum SEMICOLON;
+property:LOWER_IDENT;
 sum : sum MUL value | sum PLUS value | sum MIN value | value;
+value:PIXELSIZE | PERCENTAGE | COLOR | SCALAR | TRUE| FALSE | variableName;
 
 
 
 
+// Enter: maak astnode, zet op stack
+// Exit: haal astnode van stack, voeg toe als kind aan node op de stack
 
