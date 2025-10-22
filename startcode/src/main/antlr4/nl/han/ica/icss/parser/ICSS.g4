@@ -54,18 +54,32 @@ ASSIGNMENT_OPERATOR: ':=';
 
 stylesheet: variable* ruleset* ;
 
-variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON;
+variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON # VariableAssignment;
 variableName: CAPITAL_IDENT;
 
 ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
 selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
 declaration:  property COLON sum SEMICOLON;
 property:LOWER_IDENT;
-sum : sum MUL value | sum PLUS value | sum MIN value | value;
-value:PIXELSIZE | PERCENTAGE | COLOR | SCALAR | TRUE| FALSE | variableName;
 
+sum : sum PLUS term  #AddOperation
+    | sum MIN term   #SubtractOperation
+    | term           #SingleTerm
+    ;
 
-
+term : term MUL factor #MultiplyOperation
+     | factor          #SingleFactor
+     ;
+factor: value ;
+value
+    : PIXELSIZE        # PixelLiteral
+    | PERCENTAGE       # PercentageLiteral
+    | COLOR            # ColorLiteral
+    | SCALAR           # ScalarLiteral
+    | TRUE             # BoolLiteral
+    | FALSE            # BoolLiteral
+    | variableName     # VariableReference
+    ;
 
 // Enter: maak astnode, zet op stack
 // Exit: haal astnode van stack, voeg toe als kind aan node op de stack
