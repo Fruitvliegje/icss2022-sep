@@ -62,16 +62,43 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(stylerule);
 	}
 
+
 	@Override
-	public void enterSelector(ICSSParser.SelectorContext ctx) {
+	public void enterIdSelector(ICSSParser.IdSelectorContext ctx) {
 		IdSelector selector = new IdSelector(ctx.getText());
 		currentContainer.push(selector);
 	}
 
+	@Override
+	public void exitIdSelector(ICSSParser.IdSelectorContext ctx) {
+		IdSelector selector = (IdSelector) currentContainer.pop();
+		currentContainer.peek().addChild(selector);
+	}
+
 
 	@Override
-	public void exitSelector(ICSSParser.SelectorContext ctx) {
-		IdSelector selector = (IdSelector) currentContainer.pop();
+	public void enterClassSelector(ICSSParser.ClassSelectorContext ctx) {
+		ClassSelector selector = new ClassSelector(ctx.getText());
+		currentContainer.push(selector);
+	}
+
+	@Override
+	public void exitClassSelector(ICSSParser.ClassSelectorContext ctx) {
+		ClassSelector selector = (ClassSelector) currentContainer.pop();
+		// De parent is de Stylerule (RuleSet)
+		currentContainer.peek().addChild(selector);
+	}
+
+	@Override
+	public void enterTagSelector(ICSSParser.TagSelectorContext ctx) {
+		TagSelector selector = new TagSelector(ctx.getText());
+		currentContainer.push(selector);
+	}
+
+	@Override
+	public void exitTagSelector(ICSSParser.TagSelectorContext ctx) {
+		TagSelector selector = (TagSelector) currentContainer.pop();
+		// De parent is de Stylerule (RuleSet)
 		currentContainer.peek().addChild(selector);
 	}
 
@@ -220,6 +247,23 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.push(variableAssignment);
 	}
 
+	@Override
+	public void exitVariableAssignment(ICSSParser.VariableAssignmentContext ctx) {
+		VariableAssignment variableAssignment = (VariableAssignment) currentContainer.pop();
+		currentContainer.peek().addChild(variableAssignment);
+	}
+
+	@Override
+	public void enterVariableName(ICSSParser.VariableNameContext ctx) {
+		VariableReference variableRef = new VariableReference(ctx.getText());
+		currentContainer.push(variableRef);
+	}
+
+	@Override
+	public void exitVariableName(ICSSParser.VariableNameContext ctx) {
+		VariableReference variableRef = (VariableReference) currentContainer.pop();
+		currentContainer.peek().addChild(variableRef);
+	}
 
 }
 

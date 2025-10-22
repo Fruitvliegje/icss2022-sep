@@ -58,7 +58,10 @@ variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON # VariableAssignment;
 variableName: CAPITAL_IDENT;
 
 ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
-selector: ID_IDENT | CLASS_IDENT | LOWER_IDENT;
+selector: ID_IDENT     #IdSelector
+        | CLASS_IDENT  #ClassSelector
+        | LOWER_IDENT  #TagSelector
+        ;
 declaration:  property COLON sum SEMICOLON;
 property:LOWER_IDENT;
 
