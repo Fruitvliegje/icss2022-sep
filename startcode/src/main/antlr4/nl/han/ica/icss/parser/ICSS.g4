@@ -50,19 +50,21 @@ ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
 
-
-
 stylesheet: variable* ruleset* ;
 
 variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON # VariableAssignment;
 variableName: CAPITAL_IDENT;
 
-ruleset: selector OPEN_BRACE declaration* CLOSE_BRACE ;
+ruleset: selector OPEN_BRACE (declaration | ifclause)* CLOSE_BRACE;
 selector: ID_IDENT     #IdSelector
         | CLASS_IDENT  #ClassSelector
         | LOWER_IDENT  #TagSelector
         ;
+ifclause: IF BOX_BRACKET_OPEN variableName BOX_BRACKET_CLOSE OPEN_BRACE declaration* ifclause* elseclause? CLOSE_BRACE;
+elseclause: ELSE OPEN_BRACE declaration CLOSE_BRACE;
+
 declaration:  property COLON sum SEMICOLON;
+
 property:LOWER_IDENT;
 
 sum : sum PLUS term  #AddOperation
@@ -83,6 +85,9 @@ value
     | FALSE            # BoolLiteral
     | variableName     # VariableReference
     ;
+
+
+
 
 // Enter: maak astnode, zet op stack
 // Exit: haal astnode van stack, voeg toe als kind aan node op de stack

@@ -14,15 +14,11 @@ import nl.han.ica.icss.ast.selectors.ClassSelector;
 import nl.han.ica.icss.ast.selectors.IdSelector;
 import nl.han.ica.icss.ast.selectors.TagSelector;
 
-/**
- * This class extracts the ICSS Abstract Syntax Tree from the Antlr Parse tree.
- */
+
 public class ASTListener extends ICSSBaseListener {
 
-	//Accumulator attributes:
 	private AST ast;
 
-	//Use this to keep track of the parent nodes when recursively traversing the ast
 	private Stack<ASTNode> currentContainer;
 
 	public ASTListener() {
@@ -35,7 +31,6 @@ public class ASTListener extends ICSSBaseListener {
 	}
 
 
-	// als root neerzetten
 	@Override
 	public void enterStylesheet(ICSSParser.StylesheetContext ctx) {
 		Stylesheet stylesheet = new Stylesheet();
@@ -265,6 +260,29 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(variableRef);
 	}
 
+	@Override
+	public void enterIfclause(ICSSParser.IfclauseContext ctx) {
+		IfClause ifClause = new IfClause();
+		currentContainer.push(ifClause);
+	}
+
+	@Override
+	public void exitIfclause(ICSSParser.IfclauseContext ctx) {
+		IfClause ifClause = (IfClause) currentContainer.pop();
+		currentContainer.peek().addChild(ifClause);
+	}
+
+	@Override
+	public void enterElseclause(ICSSParser.ElseclauseContext ctx) {
+		ElseClause elseClause= new ElseClause();
+		currentContainer.push(elseClause);
+	}
+
+	@Override
+	public void exitElseclause(ICSSParser.ElseclauseContext ctx) {
+		ElseClause elseClause = (ElseClause) currentContainer.pop();
+		currentContainer.peek().addChild(elseClause);
+	}
 }
 
 
