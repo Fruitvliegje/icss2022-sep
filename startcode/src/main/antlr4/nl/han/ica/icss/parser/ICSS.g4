@@ -8,6 +8,15 @@ ELSE: 'else';
 BOX_BRACKET_OPEN: '[';
 BOX_BRACKET_CLOSE: ']';
 
+// FOR
+
+FOR: 'for';
+INRANGE: 'in range';
+BRACKET_OPEN: '(';
+BRACKET_CLOSE: ')';
+KOMMA: ',';
+
+
 
 //Literals
 TRUE: 'TRUE';
@@ -50,18 +59,31 @@ ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
 
-stylesheet: variable* ruleset* ;
+stylesheet: (variable | ruleset)* ;
 
 variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON # VariableAssignment;
 variableName: CAPITAL_IDENT;
 
-ruleset: selector OPEN_BRACE (declaration | ifclause)* CLOSE_BRACE;
+ruleset: selector OPEN_BRACE (variable | declaration | ifclause)* CLOSE_BRACE;
 selector: ID_IDENT     #IdSelector
         | CLASS_IDENT  #ClassSelector
         | LOWER_IDENT  #TagSelector
         ;
-ifclause: IF BOX_BRACKET_OPEN variableName BOX_BRACKET_CLOSE OPEN_BRACE declaration* ifclause* elseclause? CLOSE_BRACE;
-elseclause: ELSE OPEN_BRACE declaration CLOSE_BRACE;
+
+for: FOR value INRANGE BRACKET_OPEN value KOMMA value BRACKET_CLOSE OPEN_BRACE
+     ruleset
+     CLOSE_BRACE;
+
+
+ifclause
+    : IF BOX_BRACKET_OPEN value BOX_BRACKET_CLOSE
+      OPEN_BRACE (variable | declaration | ifclause)* CLOSE_BRACE
+      elseclause?
+    ;
+
+elseclause
+    : ELSE OPEN_BRACE (variable | declaration)* CLOSE_BRACE
+    ;
 
 declaration:  property COLON sum SEMICOLON;
 
@@ -69,13 +91,14 @@ property:LOWER_IDENT;
 
 sum : sum PLUS term  #AddOperation
     | sum MIN term   #SubtractOperation
-    | term           #SingleTerm
+    | term           #ST
     ;
 
 term : term MUL factor #MultiplyOperation
-     | factor          #SingleFactor
+     | factor          #SF
      ;
 factor: value ;
+
 value
     : PIXELSIZE        # PixelLiteral
     | PERCENTAGE       # PercentageLiteral

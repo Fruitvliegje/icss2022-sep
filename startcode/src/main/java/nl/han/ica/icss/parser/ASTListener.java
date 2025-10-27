@@ -80,7 +80,6 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void exitClassSelector(ICSSParser.ClassSelectorContext ctx) {
 		ClassSelector selector = (ClassSelector) currentContainer.pop();
-		// De parent is de Stylerule (RuleSet)
 		currentContainer.peek().addChild(selector);
 	}
 
@@ -93,7 +92,6 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void exitTagSelector(ICSSParser.TagSelectorContext ctx) {
 		TagSelector selector = (TagSelector) currentContainer.pop();
-		// De parent is de Stylerule (RuleSet)
 		currentContainer.peek().addChild(selector);
 	}
 
