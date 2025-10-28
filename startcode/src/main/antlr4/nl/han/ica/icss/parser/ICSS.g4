@@ -15,6 +15,7 @@ INRANGE: 'in range';
 BRACKET_OPEN: '(';
 BRACKET_CLOSE: ')';
 KOMMA: ',';
+HASH_OPEN: '#{';
 
 
 
@@ -59,18 +60,27 @@ ASSIGNMENT_OPERATOR: ':=';
 
 //--- PARSER: ---
 
-stylesheet: (variable | ruleset)* ;
+stylesheet: (variable | ruleset | forloop)* ;
 
 variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON # VariableAssignment;
 variableName: CAPITAL_IDENT;
 
 ruleset: selector OPEN_BRACE (variable | declaration | ifclause)* CLOSE_BRACE;
-selector: ID_IDENT     #IdSelector
-        | CLASS_IDENT  #ClassSelector
-        | LOWER_IDENT  #TagSelector
-        ;
 
-for: FOR value INRANGE BRACKET_OPEN value KOMMA value BRACKET_CLOSE OPEN_BRACE
+selector
+    : baseSelector                               #Simpleselector
+    | baseSelector HASH_OPEN loopidentifier CLOSE_BRACE   #InterpolatedSelector
+    ;
+
+baseSelector
+    : ID_IDENT      # IdSelector
+    | CLASS_IDENT   # ClassSelector
+    | LOWER_IDENT    # TagSelector
+    ;
+
+
+
+forloop: FOR loopidentifier INRANGE BRACKET_OPEN value KOMMA value BRACKET_CLOSE OPEN_BRACE
      ruleset
      CLOSE_BRACE;
 
@@ -107,9 +117,10 @@ value
     | TRUE             # BoolLiteral
     | FALSE            # BoolLiteral
     | variableName     # VariableReference
+    | loopidentifier   #Gaanweniksmeedoen
     ;
 
-
+loopidentifier: '$' LOWER_IDENT;
 
 
 // Enter: maak astnode, zet op stack

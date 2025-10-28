@@ -1,0 +1,128 @@
+BaseWidth := 100px;
+BaseHeight := 40px;
+BasePadding := 10px;
+Scale := 2;
+Offset := 15px;
+EnableDarkMode := TRUE;
+EnableHeader := TRUE;
+PrimaryColor := #112233;
+SecondaryColor := #445566;
+AccentColor := #ff8800;
+LightColor := #eeeeee;
+
+body {
+    BodyWidth := BaseWidth * Scale + Offset;
+    width: BodyWidth;
+    height: BaseHeight * Scale;
+    background-color: LightColor;
+
+    if [EnableDarkMode] {
+        background-color: #000000;
+        color: LightColor;
+    } else {
+        color: #000000;
+        background-color: #ffffff;
+    }
+}
+
+header {
+    HeaderHeight := BaseHeight + 20px;
+    width: BaseWidth * 3;
+    height: HeaderHeight;
+
+    if [EnableHeader] {
+        background-color: PrimaryColor;
+        color: LightColor;
+
+        if [EnableDarkMode] {
+            ShadowColor := #222222;
+            background-color: ShadowColor;
+        } else {
+            background-color: SecondaryColor;
+        }
+    } else {
+        background-color: #cccccc;
+    }
+}
+
+p {
+    TextColor := AccentColor;
+    color: TextColor;
+
+    ParWidth := BaseWidth + Offset * 2;
+    ParHeight := BaseHeight - 10px;
+    width: ParWidth;
+    height: ParHeight;
+
+    if [EnableDarkMode] {
+        ShadowIntensity := 2;
+        AdjustedWidth := ParWidth + Offset * ShadowIntensity;
+        width: AdjustedWidth;
+    }
+}
+
+#menu {
+    MenuWidth := BaseWidth * 4 + Offset;
+    MenuHeight := BaseHeight + BasePadding * 2;
+    width: MenuWidth;
+    height: MenuHeight;
+
+    if [EnableDarkMode] {
+        background-color: SecondaryColor;
+        if [EnableHeader] {
+            BorderColor := #ff0000;
+            color: BorderColor;
+        } else {
+            color: LightColor;
+        }
+    } else {
+        background-color: LightColor;
+    }
+}
+
+
+Testone :=#333333;
+Testtwo:= Testone;
+.menu {
+    ItemWidth := BaseWidth * 2 + 25px;
+    ItemHeight := BaseHeight - 5px;
+    width: ItemWidth;
+    height: ItemHeight;
+    color: PrimaryColor;
+
+    if [EnableDarkMode] {
+        background-color: Testone;
+    } else {
+        background-color: AccentColor;
+    }
+}
+
+footer {
+    FooterHeight := BaseHeight + 5px * 2;
+    height: FooterHeight;
+
+    if [EnableDarkMode] {
+        background-color: PrimaryColor;
+    } else {
+        background-color: #cccccc;
+    }
+
+    if [EnableHeader] {
+        ExtraPadding := BasePadding * 2;
+        height: FooterHeight + ExtraPadding;
+    }
+}
+
+.sidebar {
+    SideWidth := BaseWidth * 2;
+    SideHeight := BaseHeight + 30px;
+    width: SideWidth;
+    height: SideHeight;
+    color: LightColor;
+    background-color: SecondaryColor;
+
+    if [EnableDarkMode] {
+        width: SideWidth + Offset;
+        background-color: PrimaryColor;
+    }
+}

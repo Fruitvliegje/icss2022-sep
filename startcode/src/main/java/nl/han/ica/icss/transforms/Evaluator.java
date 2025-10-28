@@ -2,11 +2,17 @@ package nl.han.ica.icss.transforms;
 
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
+import nl.han.ica.icss.ast.loops.ForLoop;
+import nl.han.ica.icss.ast.loops.LoopIdentifier;
 import nl.han.ica.icss.ast.operations.*;
+import nl.han.ica.icss.ast.selectors.ClassSelector;
+import nl.han.ica.icss.ast.selectors.IdSelector;
+import nl.han.ica.icss.ast.selectors.TagSelector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Evaluator implements Transform {
 
@@ -29,6 +35,8 @@ public class Evaluator implements Transform {
             } else if (child instanceof Stylerule) {
                 applyStylerule((Stylerule) child);
                 evaluatedChildren.add(child);
+            } else if (child instanceof ForLoop) {
+                applyForLoop((ForLoop) child, evaluatedChildren);
             }
         }
 
@@ -52,9 +60,10 @@ public class Evaluator implements Transform {
 
         node.body = new ArrayList<>(evaluatedBody);
         variableValues.pop();
+
     }
 
-    private void applyIfClause(IfClause ifClause, LinkedList<ASTNode> parentBody) {
+    private void applyIfClause(IfClause ifClause, List<ASTNode> parentBody) {
         Expression conditionExpr = evaluateExpression(ifClause.conditionalExpression);
 
         boolean conditionTrue = false;
@@ -71,18 +80,20 @@ public class Evaluator implements Transform {
         }
     }
 
-    private void applyElseClause(ElseClause elseClause, LinkedList<ASTNode> parentBody) {
+    private void applyElseClause(ElseClause elseClause, List<ASTNode> parentBody) {
         variableValues.push(new HashMap<>());
         applyBody(elseClause.body, parentBody);
         variableValues.pop();
     }
 
-    private void applyBody(ArrayList<ASTNode> body, LinkedList<ASTNode> parentBody) {
+    private void applyBody(ArrayList<ASTNode> body, List<ASTNode> parentBody) {
         for (ASTNode child : body) {
             if (child instanceof VariableAssignment) {
                 applyVariableAssignment((VariableAssignment) child);
             }
         }
+
+        // Dan de rest
         for (ASTNode child : body) {
             if (child instanceof Declaration) {
                 applyDeclaration((Declaration) child);
@@ -107,6 +118,9 @@ public class Evaluator implements Transform {
 
             } else if (child instanceof IfClause) {
                 applyIfClause((IfClause) child, parentBody);
+            } else if (child instanceof Stylerule) {
+                applyStylerule((Stylerule) child);
+                parentBody.add(child);
             }
         }
     }
@@ -204,5 +218,89 @@ public class Evaluator implements Transform {
             }
         }
         return null;
+    }
+
+
+    private void applyForLoop(ForLoop forLoop, List<ASTNode> parentBody) {
+        Expression startExpr = evaluateExpression(forLoop.rangeStart);
+        Expression endExpr = evaluateExpression(forLoop.rangeEnd);
+
+        if (!(startExpr instanceof ScalarLiteral) || !(endExpr instanceof ScalarLiteral)) return;
+
+        int start = ((ScalarLiteral) startExpr).value;
+        int end = ((ScalarLiteral) endExpr).value;
+
+        for (int i = start; i <= end; i++) {
+            for (ASTNode bodyNode : forLoop.body) {
+                if (!(bodyNode instanceof Stylerule)) continue;
+
+                Stylerule original = (Stylerule) bodyNode;
+                Stylerule newStylerule = new Stylerule();
+                newStylerule.selectors = new ArrayList<>();
+                newStylerule.body = new ArrayList<>();
+
+                for (Selector sel : original.selectors) {
+                    if (sel instanceof IdSelector)
+                        newStylerule.selectors.add(new IdSelector(((IdSelector) sel).id + i));
+                    else if (sel instanceof ClassSelector)
+                        newStylerule.selectors.add(new ClassSelector(((ClassSelector) sel).cls + i));
+                    else if (sel instanceof TagSelector)
+                        newStylerule.selectors.add(new TagSelector(((TagSelector) sel).tag + i));
+                }
+
+                for (ASTNode innerNode : original.body) {
+                    if (innerNode instanceof Declaration) {
+                        Declaration originalDecl = (Declaration) innerNode;
+                        Declaration newDecl = new Declaration();
+                        newDecl.property = originalDecl.property;
+
+                        Expression replaced = replaceLoopIdentifier(originalDecl.expression, i);
+                        newDecl.expression = evaluateExpression(replaced);
+
+                        newStylerule.body.add(newDecl);
+                    }
+                }
+
+                parentBody.add(newStylerule);
+            }
+        }
+    }
+
+    private Expression replaceLoopIdentifier(Expression expr, int value) {
+        if (expr instanceof LoopIdentifier) {
+            return new ScalarLiteral(value);
+        }
+
+        if (expr instanceof PixelLiteral) {
+            return new PixelLiteral(((PixelLiteral) expr).value);
+        }
+
+        if (expr instanceof PercentageLiteral) {
+            return new PercentageLiteral(((PercentageLiteral) expr).value);
+        }
+
+        if (expr instanceof ScalarLiteral) {
+            return new ScalarLiteral(((ScalarLiteral) expr).value);
+        }
+
+        if (expr instanceof VariableReference) {
+            return expr;
+        }
+
+        if (expr instanceof Operation) {
+            Operation op = (Operation) expr;
+            Operation newOp;
+
+            if (op instanceof MultiplyOperation) newOp = new MultiplyOperation();
+            else if (op instanceof AddOperation) newOp = new AddOperation();
+            else if (op instanceof SubtractOperation) newOp = new SubtractOperation();
+            else return expr;
+
+            newOp.lhs = replaceLoopIdentifier(op.lhs, value);
+            newOp.rhs = replaceLoopIdentifier(op.rhs, value);
+            return newOp;
+        }
+
+        return expr;
     }
 }

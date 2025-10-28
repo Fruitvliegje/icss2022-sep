@@ -1,12 +1,12 @@
 package nl.han.ica.icss.parser;
 
-import java.awt.*;
 import java.util.Stack;
 
 
-import nl.han.ica.datastructures.IHANStack;
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
+import nl.han.ica.icss.ast.loops.ForLoop;
+import nl.han.ica.icss.ast.loops.LoopIdentifier;
 import nl.han.ica.icss.ast.operations.AddOperation;
 import nl.han.ica.icss.ast.operations.MultiplyOperation;
 import nl.han.ica.icss.ast.operations.SubtractOperation;
@@ -281,6 +281,37 @@ public class ASTListener extends ICSSBaseListener {
 		ElseClause elseClause = (ElseClause) currentContainer.pop();
 		currentContainer.peek().addChild(elseClause);
 	}
+
+
+
+
+	@Override
+	public void enterForloop(ICSSParser.ForloopContext ctx) {
+		ForLoop forLoop = new ForLoop();
+		currentContainer.push(forLoop);
+	}
+
+	@Override
+	public void exitForloop(ICSSParser.ForloopContext ctx) {
+	   ForLoop forLoop = (ForLoop) currentContainer.pop();
+	   currentContainer.peek().addChild(forLoop);
+	}
+
+	@Override
+	public void enterLoopidentifier(ICSSParser.LoopidentifierContext ctx) {
+		LoopIdentifier loopIdentifier = new LoopIdentifier(ctx.getText());
+		currentContainer.push(loopIdentifier);
+	}
+
+
+	@Override
+	public void exitLoopidentifier(ICSSParser.LoopidentifierContext ctx) {
+		LoopIdentifier loopIdentifier = (LoopIdentifier) currentContainer.pop();
+		currentContainer.peek().addChild(loopIdentifier);
+
+	}
+
+
 }
 
 

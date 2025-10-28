@@ -2,6 +2,7 @@ package nl.han.ica.icss.checker;
 
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
+import nl.han.ica.icss.ast.loops.ForLoop;
 import nl.han.ica.icss.ast.operations.AddOperation;
 import nl.han.ica.icss.ast.operations.MultiplyOperation;
 import nl.han.ica.icss.ast.operations.SubtractOperation;
@@ -27,6 +28,8 @@ public class Checker {
                 checkVariableAssignment((VariableAssignment) child);
             } else if (child instanceof Stylerule) {
                 checkStylerule((Stylerule) child);
+            }else if (child instanceof ForLoop) {
+                checkForLoop((ForLoop) child);
             }
         }
         variableTypes.pop();
@@ -89,15 +92,15 @@ public class Checker {
             }
         }
 
-        for(ASTNode child : body){
-            if(child instanceof Declaration){
-                checkDeclaration((Declaration)child);
-            } else if (child instanceof IfClause){
-                checkIfClause((IfClause)child);
+        for (ASTNode child : body) {
+            if (child instanceof Declaration) {
+                checkDeclaration((Declaration) child);
+            } else if (child instanceof IfClause) {
+                checkIfClause((IfClause) child);
             }
+
         }
     }
-
     private void checkDeclaration(Declaration declaration) {
         String propertyName = declaration.property.name;
 
@@ -212,6 +215,42 @@ public class Checker {
         }
 
         declaration.setError("Property '" + declaration.property.name + "' vereist COLOR, maar resulteert in " + resultType.name());
+    }
+
+
+    private void checkForLoop(ForLoop forLoop) {
+        if (forLoop.loopVariable == null) {
+            forLoop.setError("For-loop mist een loopvariabele.");
+            return;
+        }
+
+        String loopVarName = forLoop.loopVariable.name;
+
+        ExpressionType fromType = getExpressionType(forLoop.rangeStart);
+        ExpressionType toType = getExpressionType(forLoop.rangeEnd);
+
+        if (fromType == ExpressionType.UNDEFINED || toType == ExpressionType.UNDEFINED) {
+            forLoop.setError("For-loop gebruikt ongedefinieerde waarden voor 'from' en/of 'to'.");
+            return;
+        }
+
+        if (fromType != ExpressionType.SCALAR || toType != ExpressionType.SCALAR) {
+            forLoop.setError("For-loop vereist SCALAR waarden voor 'from' en 'to', maar kreeg "
+                    + fromType + " en " + toType + ".");
+            return;
+        }
+
+        variableTypes.push(new HashMap<>());
+
+        variableTypes.peek().put(loopVarName, ExpressionType.SCALAR);
+
+        if (forLoop.body == null || forLoop.body.isEmpty()) {
+            forLoop.setError("For-loop heeft een lege body.");
+        } else {
+            checkBody(forLoop.body);
+        }
+
+        variableTypes.pop();
     }
 
 }
