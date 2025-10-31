@@ -1,10 +1,11 @@
 package nl.han.ica.icss.ast.loops;
 
 import nl.han.ica.icss.ast.Expression;
+import nl.han.ica.icss.ast.Literal;
 
 import java.util.Objects;
 
-public class LoopIdentifier extends Expression {
+public class LoopIdentifier extends Literal {
 
     public String name;
 

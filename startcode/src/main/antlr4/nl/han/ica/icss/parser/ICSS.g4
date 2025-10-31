@@ -9,7 +9,6 @@ BOX_BRACKET_OPEN: '[';
 BOX_BRACKET_CLOSE: ']';
 
 // FOR
-
 FOR: 'for';
 INRANGE: 'in range';
 BRACKET_OPEN: '(';
@@ -17,15 +16,12 @@ BRACKET_CLOSE: ')';
 KOMMA: ',';
 HASH_OPEN: '#{';
 
-
-
 //Literals
 TRUE: 'TRUE';
 FALSE: 'FALSE';
 PIXELSIZE: [0-9]+ 'px';
 PERCENTAGE: [0-9]+ '%';
 SCALAR: [0-9]+;
-
 
 //Color value takes precedence over id idents
 COLOR: '#' [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f] [0-9a-f];
@@ -59,7 +55,6 @@ ASSIGNMENT_OPERATOR: ':=';
 
 
 //--- PARSER: ---
-
 stylesheet: (variable | ruleset | forloop)* ;
 
 variable: variableName ASSIGNMENT_OPERATOR sum SEMICOLON # VariableAssignment;
@@ -68,7 +63,7 @@ variableName: CAPITAL_IDENT;
 ruleset: selector OPEN_BRACE (variable | declaration | ifclause)* CLOSE_BRACE;
 
 selector
-    : baseSelector                               #Simpleselector
+    : baseSelector                                        #Simpleselector
     | baseSelector HASH_OPEN loopidentifier CLOSE_BRACE   #InterpolatedSelector
     ;
 
@@ -78,12 +73,9 @@ baseSelector
     | LOWER_IDENT    # TagSelector
     ;
 
-
-
 forloop: FOR loopidentifier INRANGE BRACKET_OPEN value KOMMA value BRACKET_CLOSE OPEN_BRACE
      ruleset
      CLOSE_BRACE;
-
 
 ifclause
     : IF BOX_BRACKET_OPEN value BOX_BRACKET_CLOSE
@@ -117,7 +109,7 @@ value
     | TRUE             # BoolLiteral
     | FALSE            # BoolLiteral
     | variableName     # VariableReference
-    | loopidentifier   #Gaanweniksmeedoen
+    | loopidentifier   # Gaanweniksmeedoen
     ;
 
 loopidentifier: '$' LOWER_IDENT;

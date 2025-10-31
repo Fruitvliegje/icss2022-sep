@@ -12,6 +12,7 @@ public class Generator {
 
 	public String generate(AST ast) {
 		output = new StringBuilder();
+		output.append("/* Nouri zijn CSS Output */ \n\n");
 		generateStylesheet(ast.root);
 		return output.toString();
 	}
@@ -52,7 +53,6 @@ public class Generator {
 	}
 
 	private void generateDeclaration(Declaration declaration) {
-		output.append("  ");
 		output.append(declaration.property.name);
 		output.append(": ");
 

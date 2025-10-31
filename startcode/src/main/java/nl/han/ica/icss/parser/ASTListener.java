@@ -3,6 +3,7 @@ package nl.han.ica.icss.parser;
 import java.util.Stack;
 
 
+import nl.han.ica.datastructures.HANStack;
 import nl.han.ica.icss.ast.*;
 import nl.han.ica.icss.ast.literals.*;
 import nl.han.ica.icss.ast.loops.ForLoop;
@@ -19,11 +20,11 @@ public class ASTListener extends ICSSBaseListener {
 
 	private AST ast;
 
-	private Stack<ASTNode> currentContainer;
+	private HANStack<ASTNode> currentContainer;
 
 	public ASTListener() {
 		ast = new AST();
-		currentContainer = new Stack<>(); // nog aanpassen naar HAN STACK
+		currentContainer = new HANStack<>(); // nog aanpassen naar HAN STACK
 	}
 
 	public AST getAST() {
@@ -123,7 +124,7 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void enterAddOperation(ICSSParser.AddOperationContext ctx) {
 		AddOperation addOperation = new AddOperation();
-        currentContainer.add(addOperation);
+        currentContainer.push(addOperation);
 	}
 
 
@@ -136,7 +137,7 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void enterMultiplyOperation(ICSSParser.MultiplyOperationContext ctx) {
 		MultiplyOperation multiplyOperation = new MultiplyOperation();
-		currentContainer.add(multiplyOperation);
+		currentContainer.push(multiplyOperation);
 	}
 
 	@Override
@@ -148,7 +149,7 @@ public class ASTListener extends ICSSBaseListener {
 	@Override
 	public void enterSubtractOperation(ICSSParser.SubtractOperationContext ctx) {
 		SubtractOperation subtractOperation = new SubtractOperation();
-		currentContainer.add(subtractOperation);
+		currentContainer.push(subtractOperation);
 	}
 
 	@Override
@@ -282,9 +283,6 @@ public class ASTListener extends ICSSBaseListener {
 		currentContainer.peek().addChild(elseClause);
 	}
 
-
-
-
 	@Override
 	public void enterForloop(ICSSParser.ForloopContext ctx) {
 		ForLoop forLoop = new ForLoop();
@@ -308,7 +306,6 @@ public class ASTListener extends ICSSBaseListener {
 	public void exitLoopidentifier(ICSSParser.LoopidentifierContext ctx) {
 		LoopIdentifier loopIdentifier = (LoopIdentifier) currentContainer.pop();
 		currentContainer.peek().addChild(loopIdentifier);
-
 	}
 
 

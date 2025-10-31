@@ -7,5 +7,5 @@ public enum ExpressionType {
     SCALAR,
     UNDEFINED,
     BOOL,
-    INTERPOLATED
+    LOOP_IDENTIFIER
 }
